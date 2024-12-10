@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Flag Checker</title>
+  </head>
+
+  <body>
+    <script>
+      let instance;
+      let wasmMemory;
+
+      (async () => {
+        const response = await fetch("check.wasm");
+        const buffer = await response.arrayBuffer();
+
+        // Instantiate the module with an empty imports object
+        const wasmInstance = await WebAssembly.instantiate(buffer, {});
+        instance = wasmInstance.instance;
+
+        // Access the WASM memory
+        const memory = instance.exports.memory;
+        wasmMemory = new Uint8Array(memory.buffer);
+      })();
+
+      async function checkFlag(inputString) {
+        // Ensure the WASM module is loaded
+        if (!instance || !wasmMemory) {
+          console.error("WASM module is not loaded yet.");
+          return;
+        }
+
+        // Encode the input string into bytes (null-terminated)
+        const encoder = new TextEncoder();
+        const inputBytes = encoder.encode(inputString + "\0");
+
+        // Allocate memory for the input string in WASM memory
+        const inputPtr = 1024; // Ensure this doesn't overlap with other data
+
+        // Ensure the memory buffer is large enough
+        if (inputPtr + inputBytes.length > wasmMemory.length) {
+          console.error("Not enough WASM memory to store the input string.");
+          return;
+        }
+
+        // Write the input string into WASM memory
+        wasmMemory.set(inputBytes, inputPtr);
+
+        // Call the check function
+        const result = instance.exports.check(inputPtr);
+
+        if (result === 1) {
+          document.getElementById("result").innerHTML = "Flag is correct!";
+        } else {
+          document.getElementById("result").innerHTML = "Incorrect flag.";
+        }
+      }
+    </script>
+  </body>
+
+  <input type="text" id="flagInput" />
+  <button onclick="checkFlag(document.getElementById('flagInput').value)">
+    Check Flag
+  </button>
+  <div id="result"></div>
+</html>
