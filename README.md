@@ -2,6 +2,8 @@
 
 Every CTF we reverse in our [course](https://whop.com/reverser-academy) will be published here for you to reverse yourself! **Solutions all on [our course](https://whop.com/reverser-academy).**
 
+Learn how to reverse CTFs and platforms like these in our [course!](https://whop.com/reverser-academy).
+
 CTFs vary in difficulty and genre, spanning from JS reversal, to WASM and JSVM reversal. Also planning to launch Android based CTFs soon.
 
 # Check out the Academy !
